@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Birthday Chronicle — A Season for Redhead</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     EDITABLE CONTENT LIVES IN THE <script> BLOCK AT THE BOTTOM.
+     Look for "EDIT ME" comments to personalise names, letters,
+     songs, and the portrait image.
+     ============================================================ */
+
+  :root{
+    --parchment: #f2e8d5;
+    --parchment-deep: #e8dbbd;
+    --ink: #2b2118;
+    --sage: #4a5d45;
+    --sage-deep: #333f30;
+    --rose: #b0576a;
+    --rose-deep: #7a3141;
+    --gold: #b9924f;
+    --gold-bright: #d4af6a;
+    --paper-shadow: rgba(43,33,24,0.18);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(176,87,106,0.10), transparent 55%),
+      radial-gradient(ellipse at 85% 15%, rgba(74,93,69,0.12), transparent 50%),
+      var(--parchment);
+    color:var(--ink);
+    font-family:"Cormorant Garamond", serif;
+    font-size:19px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  .paper-texture{
+    position:fixed; inset:0; pointer-events:none; z-index:0; opacity:0.5;
+    background-image:
+      repeating-linear-gradient(0deg, rgba(43,33,24,0.02) 0px, transparent 1px, transparent 3px),
+      repeating-linear-gradient(90deg, rgba(43,33,24,0.015) 0px, transparent 1px, transparent 3px);
+  }
+
+  .wrap{position:relative; z-index:1; max-width:900px; margin:0 auto; padding:56px 24px 90px;}
+
+  /* ---------- Masthead ---------- */
+  .masthead{text-align:center; padding-bottom:28px; border-bottom:3px double var(--ink); margin-bottom:34px;}
+  .masthead .eyebrow{
+    font-family:"EB Garamond", serif; letter-spacing:0.32em; text-transform:uppercase;
+    font-size:12.5px; color:var(--rose-deep); margin:0 0 10px;
+  }
+  .masthead h1{
+    font-family:"Playfair Display", serif; font-weight:900; font-style:italic;
+    font-size:clamp(38px, 7vw, 66px); margin:0; line-height:1.05; color:var(--sage-deep);
+    text-shadow: 1px 1px 0 rgba(185,146,79,0.25);
+  }
+  .masthead .sub{
+    font-family:"EB Garamond", serif; font-size:15px; letter-spacing:0.05em;
+    color:#5b4d3a; margin-top:12px;
+  }
+  .masthead .sub b{color:var(--rose-deep); font-weight:600;}
+  .flourish{width:120px; height:14px; margin:16px auto 0; opacity:0.65;}
+
+  /* ---------- Lede ---------- */
+  .lede{
+    font-family:"Cormorant Garamond", serif; font-size:21px; font-style:italic;
+    text-align:center; max-width:640px; margin:0 auto 46px; color:#3d3225;
+  }
+  .lede::first-letter{
+    font-family:"Playfair Display", serif; font-style:normal; font-weight:900;
+    font-size:52px; float:left; line-height:0.75; padding:6px 8px 0 0; color:var(--rose-deep);
+  }
+
+  /* ---------- Countdown (pre-birthday) ---------- */
+  .countdown-card{
+    background:var(--parchment-deep); border:1px solid rgba(43,33,24,0.15);
+    border-radius:6px; padding:42px 30px; text-align:center;
+    box-shadow:0 18px 40px -20px var(--paper-shadow);
+  }
+  .countdown-card h2{
+    font-family:"Playfair Display", serif; font-style:italic; font-weight:700;
+    font-size:26px; margin:0 0 22px; color:var(--sage-deep);
+  }
+  .countdown-grid{display:flex; justify-content:center; gap:22px; flex-wrap:wrap;}
+  .cd-unit{min-width:78px;}
+  .cd-num{
+    font-family:"Playfair Display", serif; font-weight:900; font-size:38px;
+    color:var(--rose-deep); line-height:1;
+  }
+  .cd-label{
+    font-family:"EB Garamond", serif; font-size:11.5px; letter-spacing:0.18em;
+    text-transform:uppercase; color:#6b5c46; margin-top:6px;
+  }
+  .countdown-note{
+    font-family:"EB Garamond", serif; font-size:14px; font-style:italic; color:#7a6a52;
+    margin-top:26px;
+  }
+
+  /* ---------- Desk (birthday view) ---------- */
+  .desk-heading{text-align:center; margin-bottom:8px;}
+  .desk-heading h2{
+    font-family:"Playfair Display", serif; font-style:italic; font-weight:700;
+    font-size:28px; color:var(--sage-deep); margin:0 0 6px;
+  }
+  .desk-heading p{
+    font-family:"EB Garamond", serif; font-size:14.5px; color:#6b5c46; margin:0 0 34px;
+  }
+
+  .desk{
+    display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr));
+    gap:22px;
+  }
+
+  .envelope{
+    position:relative; background:linear-gradient(160deg, #fbf6e9, #ede0c0);
+    border:1px solid rgba(43,33,24,0.15); border-radius:4px;
+    padding:26px 18px 22px; text-align:center; cursor:pointer;
+    box-shadow:0 12px 26px -16px var(--paper-shadow);
+    transition:transform 0.25s ease, box-shadow 0.25s ease;
+  }
+  .envelope:hover{transform:translateY(-5px); box-shadow:0 20px 34px -16px var(--paper-shadow);}
+  .envelope:focus-visible{outline:2px solid var(--rose-deep); outline-offset:3px;}
+  .envelope.locked{cursor:not-allowed; opacity:0.72;}
+  .envelope.locked:hover{transform:none;}
+  .envelope.opened{border-color:var(--gold); box-shadow:0 12px 26px -16px rgba(185,146,79,0.4);}
+
+  .seal{
+    width:56px; height:56px; margin:0 auto 14px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--rose), var(--rose-deep) 75%);
+    display:flex; align-items:center; justify-content:center;
+    font-family:"Playfair Display", serif; font-weight:700; font-style:italic;
+    color:#f6e9c9; font-size:20px;
+    box-shadow:inset 0 -3px 6px rgba(0,0,0,0.25), 0 4px 10px rgba(0,0,0,0.2);
+    position:relative;
+  }
+  .envelope.locked .seal{
+    background:radial-gradient(circle at 35% 30%, #9a9482, #6f6a5b 75%);
+    color:#e4ddc8;
+  }
+  .seal.crack{animation:crack 0.55s ease forwards;}
+  @keyframes crack{
+    0%{transform:scale(1) rotate(0);}
+    35%{transform:scale(1.18) rotate(-6deg);}
+    60%{transform:scale(0.94) rotate(4deg);}
+    100%{transform:scale(1) rotate(0);}
+  }
+
+  .env-time{
+    font-family:"EB Garamond", serif; font-size:11px; letter-spacing:0.15em;
+    text-transform:uppercase; color:var(--gold); margin-bottom:6px;
+  }
+  .envelope.locked .env-time{color:#8a8163;}
+  .env-title{
+    font-family:"Playfair Display", serif; font-style:italic; font-weight:700;
+    font-size:18px; color:var(--sage-deep); margin-bottom:6px;
+  }
+  .env-status{
+    font-family:"EB Garamond", serif; font-size:12.5px; color:#7a6a52;
+  }
+  .env-status.ready{color:var(--rose-deep); font-weight:600;}
+
+  /* ---------- Finale (after birthday) ---------- */
+  .finale{text-align:center;}
+  .finale h2{
+    font-family:"Playfair Display", serif; font-style:italic; font-weight:700;
+    font-size:28px; color:var(--sage-deep);
+  }
+  .finale p{font-family:"EB Garamond", serif; color:#5b4d3a; max-width:520px; margin:10px auto 30px;}
+
+  /* ---------- Preview toggle (sender-only) ---------- */
+  .preview-toggle{
+    text-align:center; margin-top:50px; font-family:"EB Garamond", serif;
+    font-size:12px; color:#9a8c70;
+  }
+  .preview-toggle button{
+    font-family:"EB Garamond", serif; font-size:12px; color:#9a8c70;
+    background:none; border:none; text-decoration:underline; cursor:pointer; padding:4px;
+  }
+  .preview-toggle button:hover{color:var(--rose-deep);}
+
+  /* ---------- Modal ---------- */
+  .overlay{
+    position:fixed; inset:0; background:rgba(30,22,15,0.55); backdrop-filter:blur(2px);
+    display:none; align-items:center; justify-content:center; padding:20px; z-index:50;
+  }
+  .overlay.show{display:flex;}
+  .modal{
+    background:var(--parchment); max-width:560px; width:100%; max-height:86vh; overflow-y:auto;
+    border-radius:6px; padding:38px 32px 32px; position:relative;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.5);
+    animation:unfurl 0.5s cubic-bezier(.2,.9,.3,1) forwards;
+    transform-origin:top center;
+  }
+  @keyframes unfurl{
+    0%{opacity:0; transform:scaleY(0.4) translateY(-10px);}
+    100%{opacity:1; transform:scaleY(1) translateY(0);}
+  }
+  .modal-close{
+    position:absolute; top:14px; right:16px; background:none; border:none;
+    font-family:"EB Garamond", serif; font-size:22px; color:#8a7a5f; cursor:pointer; line-height:1;
+  }
+  .modal-close:hover{color:var(--rose-deep);}
+  .modal-label{
+    font-family:"EB Garamond", serif; font-size:11.5px; letter-spacing:0.2em; text-transform:uppercase;
+    color:var(--gold); margin-bottom:10px;
+  }
+  .modal h3{
+    font-family:"Playfair Display", serif; font-style:italic; font-weight:700; font-size:26px;
+    color:var(--sage-deep); margin:0 0 18px;
+  }
+  .modal-body{font-family:"Cormorant Garamond", serif; font-size:18px; color:#3d3225;}
+  .modal-body p{margin:0 0 14px;}
+  .signoff{
+    font-family:"Playfair Display", serif; font-style:italic; font-weight:700;
+    text-align:right; margin-top:22px; color:var(--rose-deep);
+  }
+  .typewriter-line{
+    overflow:hidden; white-space:normal; opacity:0; animation:fadein 0.6s ease forwards;
+  }
+
+  @keyframes fadein{ to{opacity:1;} }
+
+  /* ---------- Mixtape modal ---------- */
+  .player-row{
+    display:flex; align-items:center; gap:16px; background:linear-gradient(160deg, #3d3225, #241c14);
+    border-radius:12px; padding:14px;
+  }
+  .vinyl{
+    width:64px; height:64px; min-width:64px; border-radius:50%;
+    background:
+      repeating-radial-gradient(circle at center, #1a1410 0px, #1a1410 2px, #2b2118 3px, #2b2118 4px);
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 14px rgba(0,0,0,0.4);
+    animation-name:spin; animation-duration:2.8s; animation-timing-function:linear;
+    animation-iteration-count:infinite; animation-play-state:paused;
+  }
+  .vinyl.spinning{animation-play-state:running;}
+  @keyframes spin{ to{transform:rotate(360deg);} }
+  .vinyl-label{
+    width:24px; height:24px; border-radius:50%; background:var(--rose-deep);
+    display:flex; align-items:center; justify-content:center;
+    font-family:"Playfair Display", serif; font-weight:700; font-style:italic;
+    color:#f6e9c9; font-size:12px;
+  }
+  .tracklist{list-style:none; padding:0; margin:0;}
+  .tracklist li{
+    display:flex; justify-content:space-between; gap:10px;
+    padding:10px 4px; border-bottom:1px dashed rgba(43,33,24,0.2);
+    font-family:"Cormorant Garamond", serif; font-size:17px;
+  }
+  .tracklist li:last-child{border-bottom:none;}
+  .tracklist li.playable{cursor:pointer; transition:background 0.15s ease;}
+  .tracklist li.playable:hover{background:rgba(185,146,79,0.1);}
+  .tracklist li.active{color:var(--rose-deep); font-weight:600;}
+  .track-num{color:var(--gold); font-weight:600; margin-right:10px;}
+  .track-artist{color:#7a6a52; font-style:italic; font-size:15px;}
+  .player-wrap{margin-bottom:14px;}
+  .rec-note{
+    font-family:"EB Garamond", serif; font-size:13.5px; font-style:italic; color:#7a6a52;
+    margin-top:16px; border-top:1px solid rgba(43,33,24,0.15); padding-top:14px;
+  }
+
+  /* ---------- Portrait modal ---------- */
+  .portrait-frame{
+    width:220px; height:270px; margin:0 auto 18px; border-radius:50% / 40%;
+    border:10px solid var(--gold); padding:6px; background:#fbf6e9;
+    box-shadow:0 14px 30px -14px rgba(0,0,0,0.4);
+  }
+  .portrait-frame svg{width:100%; height:100%; border-radius:50% / 40%;}
+  .portrait-caption{
+    text-align:center; font-family:"EB Garamond", serif; font-style:italic; font-size:13.5px;
+    color:#7a6a52; margin-top:-4px;
+  }
+
+  /* ---------- Boon / toast card ---------- */
+  .boon-card{
+    border:2px dashed var(--gold); border-radius:6px; padding:20px; text-align:center;
+    background:rgba(212,175,106,0.08);
+  }
+
+  footer{
+    text-align:center; margin-top:60px; font-family:"EB Garamond", serif; font-size:12px; color:#a5977c;
+  }
+
+  @media (max-width:480px){
+    .modal{padding:28px 20px 24px;}
+    .countdown-grid{gap:14px;}
+    .cd-num{font-size:30px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="paper-texture"></div>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Vol. I · No. 1 · A Publication of Note</p>
+    <h1>The Birthday Chronicle</h1>
+    <p class="sub">Being a true and faithful account of the surprises awaiting <b id="herNameSpot">Redhead</b> · Compiled with the utmost discretion by a devoted friend</p>
+    <svg class="flourish" viewBox="0 0 120 14"><path d="M2 7 C 30 -3, 50 17, 60 7 S 90 -3, 118 7" fill="none" stroke="#b9924f" stroke-width="1.4"/></svg>
+  </header>
+
+  <p class="lede" id="ledeText">
+    This author has it on the very best authority that today — the day of Her arrival into this world, all those years ago — has been arranged with a small procession of dispatches. Five, to be precise. Each sealed. Each timed. Each utterly undeserved by anyone but her.
+  </p>
+
+  <!-- ===================== COUNTDOWN VIEW ===================== -->
+  <section class="countdown-card" id="countdownSection" style="display:none;">
+    <h2>The Season Has Not Yet Begun</h2>
+    <div class="countdown-grid">
+      <div class="cd-unit"><div class="cd-num" id="cdDays">00</div><div class="cd-label">Days</div></div>
+      <div class="cd-unit"><div class="cd-num" id="cdHours">00</div><div class="cd-label">Hours</div></div>
+      <div class="cd-unit"><div class="cd-num" id="cdMins">00</div><div class="cd-label">Minutes</div></div>
+      <div class="cd-unit"><div class="cd-num" id="cdSecs">00</div><div class="cd-label">Seconds</div></div>
+    </div>
+    <p class="countdown-note">Return on the appointed day, and five sealed dispatches shall reveal themselves — one every five hours, from the stroke of midnight.</p>
+  </section>
+
+  <!-- ===================== DESK VIEW (BIRTHDAY) ===================== -->
+  <section id="deskSection" style="display:none;">
+    <div class="desk-heading">
+      <h2>The Desk Awaits</h2>
+      <p>Five dispatches. One unlocks every five hours. Tap a seal once it is ready to be broken.</p>
+    </div>
+    <div class="desk" id="deskGrid"></div>
+  </section>
+
+  <!-- ===================== FINALE VIEW (AFTER) ===================== -->
+  <section class="finale" id="finaleSection" style="display:none;">
+    <h2>The Season Has Concluded — For Now</h2>
+    <p>Every dispatch has been delivered. They remain here, unsealed, should she wish to revisit any of them.</p>
+    <div class="desk" id="deskGridFinale"></div>
+  </section>
+
+  <div class="preview-toggle">
+    <button id="previewBtn" type="button">— sender's peek: preview all dispatches unlocked —</button>
+  </div>
+
+  <footer>Printed on parchment, delivered with affection · Not to be reproduced without a wax seal of approval</footer>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<script>
+/* ================================================================
+   EDIT ME — personalise everything in this block.
+   ================================================================ */
+
+const HER_NAME = "Redhead";              // her name / nickname, shown in the masthead
+const YOUR_SIGNOFF = "Your devoted friend"; // how the letter is signed
+
+// The birthday itself. Month is 0-indexed (June=5, July=6, August=7).
+const BIRTHDAY_MONTH = 6;   // July
+const BIRTHDAY_DATE  = 31;
+
+// ---- Dispatch 1: The Letter -------------------------------------------
+const LETTER_PARAGRAPHS = [
+  "My dearest " + HER_NAME + ",",
+  "If you are reading this, it means the clock has struck midnight and, with it, another year of you has begun — which this author considers the finest piece of news to cross her desk all season.",
+  "I could write you something proper and polished, full of the sort of compliments one reads in a card from the chemist. Instead I will simply tell you the truth: knowing you has made my life considerably richer, considerably funnier, and considerably harder to be sad in for very long.",
+  "So today, let yourself be celebrated without arguing about it. That is an order, not a suggestion.",
+  "There is more waiting for you throughout the day — a little music, a little portrait, and one small favour redeemable whenever you like. Consider this the opening act."
+];
+
+// ---- Dispatch 2: The Morning Note --------------------------------------
+const MORNING_NOTE = "Good morning, birthday girl. Before the day gets busy — I hope it starts soft, smells like coffee, and gives you exactly zero reasons to check your phone for work. The next dispatch arrives at 10 o'clock. Try to look surprised.";
+
+// ---- Dispatch 3: The Mixtape --------------------------------------------
+// Add real tracks here — title and artist. Leave "link" empty or paste a
+// Spotify / YouTube URL if you'd like the track name to be clickable.
+const MIXTAPE_TITLE = "A Season of Songs, Vol. I";
+// spotifyId = the part after "track/" in an open.spotify.com track link.
+// Leave spotifyId empty for a track and it just won't be clickable.
+const MIXTAPE_TRACKS = [
+  { title: "Work Song", artist: "Hozier", spotifyId: "4Vc3bzFxXdrABa2DxgyCMT" },
+  { title: "Bibanke", artist: "Asa", spotifyId: "3GgYYPUOIwd1uMBvfv5bNW" },
+  { title: "Hummingbird", artist: "Metro Boomin & James Blake (Across the Spider-Verse)", spotifyId: "0J1kF6VdorvmLjmRJObiV1" },
+  { title: "LOVE. (feat. Zacari)", artist: "Kendrick Lamar", spotifyId: "6PGoSes0D9eUDeeAafB2As" },
+  { title: "Labyrinth", artist: "Taylor Swift", spotifyId: "0A1JLUlkZkp2EFrosoNQi0" },
+  { title: "Cariño", artist: "The Marías", spotifyId: "55DyBUkjebkcYhDGfEXitR" },
+  { title: "Always Free", artist: "Jackie Venson", spotifyId: "4h1F7VqBTh4vFE19DB5jJk" },
+  { title: "— add your pick here — (Lacey?)", artist: "", spotifyId: "" },
+  { title: "— add your pick here — (Falling Forward?)", artist: "", spotifyId: "" },
+  { title: "— add your pick here — (from her Arcane playlist)", artist: "", spotifyId: "" }
+];
+// A couple more Bridgerton-flavoured suggestions if you want extra inspiration —
+// these are real orchestral covers actually used on the show. Delete if unneeded.
+const MIXTAPE_SUGGESTIONS = [
+  "Vitamin String Quartet's covers of \"Wildest Dreams\" and \"thank u, next\" both appear in the show and would sit nicely next to Labyrinth.",
+  "Kris Bowers's original Bridgerton score (the Duke & Duchess cues) if you want one instrumental palate-cleanser on the tape."
+];
+
+// ---- Dispatch 4: The Portrait --------------------------------------------
+// Replace PORTRAIT_IMAGE with a path/URL to her photo when you have one,
+// e.g. PORTRAIT_IMAGE = "redhead-photo.jpg";
+// Until then, an illustrated placeholder is shown and shaded in on open.
+const PORTRAIT_IMAGE = "";
+const PORTRAIT_CAPTION = "A likeness, rendered with more patience than skill.";
+
+// ---- Dispatch 5: The Boon (closing favour / voucher) ---------------------
+const BOON_TITLE = "One Boon, Redeemable at Any Hour";
+const BOON_TEXT = "This dispatch entitles the bearer to one favour of her choosing — a dinner out, a lazy day, a shoulder to complain on, or a plan we've been putting off for months. No expiry. No arguments.";
+
+/* ================================================================
+   Below this line is the mechanism. No need to edit unless you want
+   to change how the unlocking works.
+   ================================================================ */
+
+document.getElementById("herNameSpot").textContent = HER_NAME;
+
+const DISPATCHES = [
+  { hour: 0,  label: "12:00 AM", title: "The First Dispatch",  type: "letter" },
+  { hour: 5,  label: "5:00 AM",  title: "The Second Dispatch", type: "note" },
+  { hour: 10, label: "10:00 AM", title: "The Third Dispatch",  type: "mixtape" },
+  { hour: 15, label: "3:00 PM",  title: "The Fourth Dispatch", type: "portrait" },
+  { hour: 20, label: "8:00 PM",  title: "The Fifth Dispatch",  type: "boon" }
+];
+
+function getBirthdayDate(referenceYear){
+  return new Date(referenceYear, BIRTHDAY_MONTH, BIRTHDAY_DATE, 0, 0, 0);
+}
+
+function computeState(now, forcePreview){
+  const year = now.getFullYear();
+  let bday = getBirthdayDate(year);
+  // if this year's birthday already fully passed (i.e. we're a full day+ past it), keep pointing at it for the finale
+  const isSameDay = now.getFullYear() === bday.getFullYear() &&
+                     now.getMonth() === bday.getMonth() &&
+                     now.getDate() === bday.getDate();
+  const isBefore = now < bday && !isSameDay;
+  const dayAfter = new Date(bday); dayAfter.setDate(dayAfter.getDate() + 1);
+  const isAfter = now >= dayAfter;
+
+  if (forcePreview) return { mode: "desk", now, bday, unlockedHour: 24 };
+  if (isBefore) return { mode: "countdown", now, bday };
+  if (isSameDay) return { mode: "desk", now, bday, unlockedHour: now.getHours() };
+  if (isAfter) return { mode: "finale", now, bday, unlockedHour: 24 };
+  return { mode: "countdown", now, bday };
+}
+
+let previewMode = false;
+
+function render(){
+  const now = new Date();
+  const state = computeState(now, previewMode);
+
+  document.getElementById("countdownSection").style.display = state.mode === "countdown" ? "block" : "none";
+  document.getElementById("deskSection").style.display = state.mode === "desk" ? "block" : "none";
+  document.getElementById("finaleSection").style.display = state.mode === "finale" ? "block" : "none";
+
+  if (state.mode === "countdown") {
+    const diff = state.bday - now;
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    document.getElementById("cdDays").textContent = String(d).padStart(2,"0");
+    document.getElementById("cdHours").textContent = String(h).padStart(2,"0");
+    document.getElementById("cdMins").textContent = String(m).padStart(2,"0");
+    document.getElementById("cdSecs").textContent = String(s).padStart(2,"0");
+  }
+
+  if (state.mode === "desk") {
+    buildDesk("deskGrid", state.unlockedHour, false);
+  }
+
+  if (state.mode === "finale") {
+    buildDesk("deskGridFinale", 24, true);
+  }
+}
+
+function nextUnlockLabel(hour){
+  const next = DISPATCHES.find(d => d.hour > hour);
+  return next ? next.label : null;
+}
+
+function buildDesk(containerId, unlockedHour, allOpened){
+  const grid = document.getElementById(containerId);
+  grid.innerHTML = "";
+  DISPATCHES.forEach((d, i) => {
+    const unlocked = allOpened || unlockedHour >= d.hour;
+    const card = document.createElement("div");
+    card.className = "envelope" + (unlocked ? "" : " locked");
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", (unlocked ? "Open" : "Locked: ") + d.title);
+
+    const monogram = HER_NAME.trim().charAt(0).toUpperCase() || "R";
+
+    card.innerHTML = `
+      <div class="seal">${unlocked ? monogram : "&#128274;"}</div>
+      <div class="env-time">${d.label}</div>
+      <div class="env-title">${d.title}</div>
+      <div class="env-status ${unlocked ? 'ready' : ''}">${unlocked ? "Ready to open" : "Sealed until " + d.label}</div>
+    `;
+
+    if (unlocked) {
+      card.addEventListener("click", () => openDispatch(d, card));
+      card.addEventListener("keypress", (e) => { if (e.key === "Enter") openDispatch(d, card); });
+    }
+    grid.appendChild(card);
+  });
+}
+
+function openDispatch(d, card){
+  const seal = card.querySelector(".seal");
+  seal.classList.add("crack");
+  card.classList.add("opened");
+  setTimeout(() => showModal(d), 250);
+}
+
+function showModal(d){
+  const box = document.getElementById("modalBox");
+  box.innerHTML = buildModalContent(d);
+  document.getElementById("overlay").classList.add("show");
+  document.getElementById("overlay").querySelector(".modal-close")?.addEventListener?.("click", closeModal);
+  box.querySelector(".modal-close").addEventListener("click", closeModal);
+}
+
+function closeModal(){
+  document.getElementById("overlay").classList.remove("show");
+}
+
+document.getElementById("overlay").addEventListener("click", (e) => {
+  if (e.target.id === "overlay") closeModal();
+});
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+
+function playTrack(spotifyId, el){
+  const player = document.getElementById("spotifyPlayer");
+  if (player) player.src = `https://open.spotify.com/embed/track/${spotifyId}?utm_source=generator&theme=0&autoplay=1`;
+  const disc = document.getElementById("vinylDisc");
+  if (disc) disc.classList.add("spinning");
+  document.querySelectorAll(".tracklist li").forEach(li => li.classList.remove("active"));
+  if (el) el.classList.add("active");
+}
+
+function buildModalContent(d){
+  if (d.type === "letter") {
+    const paras = LETTER_PARAGRAPHS.map((p, i) =>
+      `<p class="typewriter-line" style="animation-delay:${i * 0.28}s">${p}</p>`
+    ).join("");
+    return `
+      <button class="modal-close" aria-label="Close">&times;</button>
+      <div class="modal-label">Dispatch the First</div>
+      <h3>A Letter, Penned in Confidence</h3>
+      <div class="modal-body">
+        ${paras}
+        <p class="signoff">— ${YOUR_SIGNOFF}</p>
+      </div>`;
+  }
+
+  if (d.type === "note") {
+    return `
+      <button class="modal-close" aria-label="Close">&times;</button>
+      <div class="modal-label">Dispatch the Second</div>
+      <h3>A Note, Slipped Under the Door</h3>
+      <div class="modal-body"><p class="typewriter-line">${MORNING_NOTE}</p></div>`;
+  }
+
+  if (d.type === "mixtape") {
+    const firstPlayable = MIXTAPE_TRACKS.find(t => t.spotifyId);
+    const tracks = MIXTAPE_TRACKS.map((t, i) => {
+      const playable = !!t.spotifyId;
+      const isFirst = firstPlayable && t.spotifyId === firstPlayable.spotifyId;
+      return `<li class="${playable ? 'playable' : ''} ${isFirst ? 'active' : ''}" ${playable ? `onclick="playTrack('${t.spotifyId}', this)"` : ''}>
+        <span><span class="track-num">${String(i+1).padStart(2,"0")}</span>${t.title}${playable ? ' &#9835;' : ''}</span>
+        <span class="track-artist">${t.artist}</span>
+      </li>`;
+    }).join("");
+    const suggestions = MIXTAPE_SUGGESTIONS.map(s => `<p>&bull; ${s}</p>`).join("");
+    const player = firstPlayable
+      ? `<div class="player-row">
+           <div class="vinyl" id="vinylDisc"><div class="vinyl-label">${(HER_NAME||"R").charAt(0).toUpperCase()}</div></div>
+           <iframe id="spotifyPlayer" style="border-radius:10px; flex:1;" src="https://open.spotify.com/embed/track/${firstPlayable.spotifyId}?utm_source=generator&theme=0" width="100%" height="80" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+         </div>`
+      : "";
+    return `
+      <button class="modal-close" aria-label="Close">&times;</button>
+      <div class="modal-label">Dispatch the Third</div>
+      <h3>${MIXTAPE_TITLE}</h3>
+      ${player}
+      <p class="rec-note" style="margin-top:14px; border-top:none; padding-top:0;">Tap a track to load and play it.</p>
+      <ul class="tracklist">${tracks}</ul>
+      <div class="rec-note"><strong>A couple more ideas if you want them:</strong>${suggestions}</div>`;
+  }
+
+  if (d.type === "portrait") {
+    const img = PORTRAIT_IMAGE
+      ? `<img src="${PORTRAIT_IMAGE}" alt="Her portrait" style="width:100%; height:100%; object-fit:cover; border-radius:50%/40%;">`
+      : placeholderPortraitSVG();
+    return `
+      <button class="modal-close" aria-label="Close">&times;</button>
+      <div class="modal-label">Dispatch the Fourth</div>
+      <h3>Her Likeness, Committed to Paper</h3>
+      <div class="portrait-frame">${img}</div>
+      <p class="portrait-caption">${PORTRAIT_CAPTION}</p>`;
+  }
+
+  if (d.type === "boon") {
+    return `
+      <button class="modal-close" aria-label="Close">&times;</button>
+      <div class="modal-label">Dispatch the Fifth &amp; Final</div>
+      <h3>${BOON_TITLE}</h3>
+      <div class="boon-card">
+        <p style="font-family:'Cormorant Garamond', serif; font-size:18px; margin:0;">${BOON_TEXT}</p>
+      </div>`;
+  }
+
+  return "";
+}
+
+function placeholderPortraitSVG(){
+  return `
+  <svg viewBox="0 0 220 270" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <radialGradient id="bgg" cx="50%" cy="35%" r="75%">
+        <stop offset="0%" stop-color="#fbf3df"/>
+        <stop offset="100%" stop-color="#e9dab8"/>
+      </radialGradient>
+      <linearGradient id="hairg" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="#8a2f22">
+          <animate attributeName="stop-color" values="#8a2f22;#b04531;#8a2f22" dur="4s" repeatCount="indefinite"/>
+        </stop>
+        <stop offset="100%" stop-color="#5c1c14"/>
+      </linearGradient>
+    </defs>
+    <rect width="220" height="270" fill="url(#bgg)"/>
+    <ellipse cx="110" cy="205" rx="62" ry="58" fill="#6b2737" opacity="0.85"/>
+    <circle cx="110" cy="115" r="52" fill="#f1cfa9"/>
+    <path d="M58 110 C 55 55, 90 30, 110 30 C 135 30, 168 55, 162 112 C 150 95, 150 80, 130 78 C 120 95, 90 95, 80 78 C 65 82, 62 100, 58 110 Z" fill="url(#hairg)"/>
+    <circle cx="92" cy="118" r="4" fill="#2b2118"/>
+    <circle cx="128" cy="118" r="4" fill="#2b2118"/>
+    <path d="M96 140 Q110 150 124 140" stroke="#7a3141" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <path d="M70 100 Q80 90 95 95" stroke="#5c1c14" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+    <path d="M150 100 Q140 90 125 95" stroke="#5c1c14" stroke-width="2.5" fill="none" stroke-linecap="round" opacity="0.7"/>
+  </svg>`;
+}
+
+document.getElementById("previewBtn").addEventListener("click", () => {
+  previewMode = !previewMode;
+  document.getElementById("previewBtn").textContent = previewMode
+    ? "— exit sender's peek —"
+    : "— sender's peek: preview all dispatches unlocked —";
+  render();
+});
+
+render();
+setInterval(render, 1000);
+</script>
+
+</body>
+</html>
