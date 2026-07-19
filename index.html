@@ -7,6 +7,16 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<script>
+  window.spotifyIframeAPI = null;
+  window.onSpotifyIframeApiReady = (IFrameAPI) => {
+    window.spotifyIframeAPI = IFrameAPI;
+    if (typeof window._spotifyApiReadyCallback === "function") {
+      window._spotifyApiReadyCallback(IFrameAPI);
+    }
+  };
+</script>
+<script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
 <style>
   /* ============================================================
      EDITABLE CONTENT LIVES IN THE <script> BLOCK AT THE BOTTOM.
@@ -239,6 +249,7 @@
     display:flex; align-items:center; gap:16px; background:linear-gradient(160deg, #3d3225, #241c14);
     border-radius:12px; padding:14px;
   }
+  #spotify-embed-placeholder{min-height:80px;}
   .vinyl{
     width:64px; height:64px; min-width:64px; border-radius:50%;
     background:
@@ -531,12 +542,18 @@ function showModal(d){
   const box = document.getElementById("modalBox");
   box.innerHTML = buildModalContent(d);
   document.getElementById("overlay").classList.add("show");
-  document.getElementById("overlay").querySelector(".modal-close")?.addEventListener?.("click", closeModal);
   box.querySelector(".modal-close").addEventListener("click", closeModal);
+  if (d.type === "mixtape") {
+    setupMixtapePlayer(MIXTAPE_TRACKS.filter(t => t.spotifyId));
+  }
 }
 
 function closeModal(){
   document.getElementById("overlay").classList.remove("show");
+  if (spotifyController) {
+    try { spotifyController.pause(); } catch (err) { /* controller already gone */ }
+    spotifyController = null;
+  }
 }
 
 document.getElementById("overlay").addEventListener("click", (e) => {
@@ -544,13 +561,63 @@ document.getElementById("overlay").addEventListener("click", (e) => {
 });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
 
-function playTrack(spotifyId, el){
-  const player = document.getElementById("spotifyPlayer");
-  if (player) player.src = `https://open.spotify.com/embed/track/${spotifyId}?utm_source=generator&theme=0&autoplay=1`;
+let spotifyController = null;
+let mixtapeOrder = [];
+let currentTrackIdx = 0;
+let lastKnownPosition = 0;
+
+function setupMixtapePlayer(order){
+  mixtapeOrder = order;
+  currentTrackIdx = 0;
+  lastKnownPosition = 0;
+  if (!order.length) return;
+
+  const create = (IFrameAPI) => {
+    const el = document.getElementById("spotify-embed-placeholder");
+    if (!el) return; // modal may have closed before the API finished loading
+    IFrameAPI.createController(el, { uri: "spotify:track:" + order[0].spotifyId, width: "100%", height: "80" }, (controller) => {
+      spotifyController = controller;
+      controller.addListener("playback_update", (e) => onSpotifyPlaybackUpdate(e));
+      controller.addListener("ready", () => { controller.play(); });
+    });
+  };
+
+  if (window.spotifyIframeAPI) {
+    create(window.spotifyIframeAPI);
+  } else {
+    window._spotifyApiReadyCallback = create; // runs once the API script finishes loading
+  }
+}
+
+function onSpotifyPlaybackUpdate(e){
+  const pos = (e && e.data && typeof e.data.position === "number") ? e.data.position : 0;
+  const dur = (e && e.data && typeof e.data.duration === "number") ? e.data.duration : 0;
+  // The embed API has no explicit "track ended" event, so we infer it: if playback
+  // was near the end and position then jumps back near zero, the track finished.
+  if (dur > 0 && lastKnownPosition > dur - 1500 && pos < 1000) {
+    advanceToNextTrack();
+  }
+  lastKnownPosition = pos;
+}
+
+function advanceToNextTrack(){
+  if (!mixtapeOrder.length) return;
+  currentTrackIdx = (currentTrackIdx + 1) % mixtapeOrder.length;
+  playTrackAt(currentTrackIdx);
+}
+
+function playTrackAt(idx, el){
+  const track = mixtapeOrder[idx];
+  if (!track || !spotifyController) return;
+  currentTrackIdx = idx;
+  lastKnownPosition = 0;
+  spotifyController.loadUri("spotify:track:" + track.spotifyId);
+  spotifyController.play();
   const disc = document.getElementById("vinylDisc");
   if (disc) disc.classList.add("spinning");
   document.querySelectorAll(".tracklist li").forEach(li => li.classList.remove("active"));
-  if (el) el.classList.add("active");
+  const targetEl = el || document.querySelector(`.tracklist li[data-idx="${idx}"]`);
+  if (targetEl) targetEl.classList.add("active");
 }
 
 function buildModalContent(d){
@@ -577,28 +644,28 @@ function buildModalContent(d){
   }
 
   if (d.type === "mixtape") {
-    const firstPlayable = MIXTAPE_TRACKS.find(t => t.spotifyId);
+    const playable = MIXTAPE_TRACKS.filter(t => t.spotifyId);
     const tracks = MIXTAPE_TRACKS.map((t, i) => {
-      const playable = !!t.spotifyId;
-      const isFirst = firstPlayable && t.spotifyId === firstPlayable.spotifyId;
-      return `<li class="${playable ? 'playable' : ''} ${isFirst ? 'active' : ''}" ${playable ? `onclick="playTrack('${t.spotifyId}', this)"` : ''}>
-        <span><span class="track-num">${String(i+1).padStart(2,"0")}</span>${t.title}${playable ? ' &#9835;' : ''}</span>
+      const pIndex = playable.indexOf(t);
+      const isPlayable = pIndex !== -1;
+      return `<li class="${isPlayable ? 'playable' : ''} ${pIndex === 0 ? 'active' : ''}" ${isPlayable ? `onclick="playTrackAt(${pIndex}, this)"` : ''} data-idx="${pIndex}">
+        <span><span class="track-num">${String(i+1).padStart(2,"0")}</span>${t.title}${isPlayable ? ' &#9835;' : ''}</span>
         <span class="track-artist">${t.artist}</span>
       </li>`;
     }).join("");
     const suggestions = MIXTAPE_SUGGESTIONS.map(s => `<p>&bull; ${s}</p>`).join("");
-    const player = firstPlayable
+    const player = playable.length
       ? `<div class="player-row">
-           <div class="vinyl" id="vinylDisc"><div class="vinyl-label">${(HER_NAME||"R").charAt(0).toUpperCase()}</div></div>
-           <iframe id="spotifyPlayer" style="border-radius:10px; flex:1;" src="https://open.spotify.com/embed/track/${firstPlayable.spotifyId}?utm_source=generator&theme=0" width="100%" height="80" frameborder="0" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
-         </div>`
+           <div class="vinyl spinning" id="vinylDisc"><div class="vinyl-label">${(HER_NAME||"R").charAt(0).toUpperCase()}</div></div>
+           <div id="spotify-embed-placeholder" style="flex:1;"></div>
+         </div>
+         <p class="rec-note" style="margin:12px 0 0; border-top:none; padding-top:0;">Plays the full song if you're already logged into Spotify in this browser — otherwise a 30-second preview. It moves to the next track on its own.</p>`
       : "";
     return `
       <button class="modal-close" aria-label="Close">&times;</button>
       <div class="modal-label">Dispatch the Third</div>
       <h3>${MIXTAPE_TITLE}</h3>
       ${player}
-      <p class="rec-note" style="margin-top:14px; border-top:none; padding-top:0;">Tap a track to load and play it.</p>
       <ul class="tracklist">${tracks}</ul>
       <div class="rec-note"><strong>A couple more ideas if you want them:</strong>${suggestions}</div>`;
   }
