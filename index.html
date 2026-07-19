@@ -7,16 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;0,900;1,600;1,700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
-<script>
-  window.spotifyIframeAPI = null;
-  window.onSpotifyIframeApiReady = (IFrameAPI) => {
-    window.spotifyIframeAPI = IFrameAPI;
-    if (typeof window._spotifyApiReadyCallback === "function") {
-      window._spotifyApiReadyCallback(IFrameAPI);
-    }
-  };
-</script>
-<script src="https://open.spotify.com/embed/iframe-api/v1" async></script>
 <style>
   /* ============================================================
      EDITABLE CONTENT LIVES IN THE <script> BLOCK AT THE BOTTOM.
@@ -249,7 +239,11 @@
     display:flex; align-items:center; gap:16px; background:linear-gradient(160deg, #3d3225, #241c14);
     border-radius:12px; padding:14px;
   }
-  #spotify-embed-placeholder{min-height:80px;}
+  .now-playing{
+    font-family:"EB Garamond", serif; font-size:12.5px; letter-spacing:0.05em;
+    color:#e4d9bc; margin-bottom:6px;
+  }
+  #audioPlayer{border-radius:20px;}
   .vinyl{
     width:64px; height:64px; min-width:64px; border-radius:50%;
     background:
@@ -395,22 +389,26 @@ const LETTER_PARAGRAPHS = [
 const MORNING_NOTE = "Good morning, birthday girl. Before the day gets busy — I hope it starts soft, smells like coffee, and gives you exactly zero reasons to check your phone for work. The next dispatch arrives at 10 o'clock. Try to look surprised.";
 
 // ---- Dispatch 3: The Mixtape --------------------------------------------
-// Add real tracks here — title and artist. Leave "link" empty or paste a
-// Spotify / YouTube URL if you'd like the track name to be clickable.
 const MIXTAPE_TITLE = "A Season of Songs, Vol. I";
-// spotifyId = the part after "track/" in an open.spotify.com track link.
-// Leave spotifyId empty for a track and it just won't be clickable.
+// Put your mp3 files in a folder named "songs" right next to this HTML file,
+// then match the filenames below. Example folder layout:
+//   bridgerton-birthday.html
+//   songs/
+//     work-song.mp3
+//     bibanke.mp3
+//     ...
+// Leave "file" empty for a track and it just won't be clickable.
 const MIXTAPE_TRACKS = [
-  { title: "Work Song", artist: "Hozier", spotifyId: "4Vc3bzFxXdrABa2DxgyCMT" },
-  { title: "Bibanke", artist: "Asa", spotifyId: "3GgYYPUOIwd1uMBvfv5bNW" },
-  { title: "Hummingbird", artist: "Metro Boomin & James Blake (Across the Spider-Verse)", spotifyId: "0J1kF6VdorvmLjmRJObiV1" },
-  { title: "LOVE. (feat. Zacari)", artist: "Kendrick Lamar", spotifyId: "6PGoSes0D9eUDeeAafB2As" },
-  { title: "Labyrinth", artist: "Taylor Swift", spotifyId: "0A1JLUlkZkp2EFrosoNQi0" },
-  { title: "Cariño", artist: "The Marías", spotifyId: "55DyBUkjebkcYhDGfEXitR" },
-  { title: "Always Free", artist: "Jackie Venson", spotifyId: "4h1F7VqBTh4vFE19DB5jJk" },
-  { title: "— add your pick here — (Lacey?)", artist: "", spotifyId: "" },
-  { title: "— add your pick here — (Falling Forward?)", artist: "", spotifyId: "" },
-  { title: "— add your pick here — (from her Arcane playlist)", artist: "", spotifyId: "" }
+  { title: "Work Song", artist: "Hozier", file: "songs/work-song.mp3" },
+  { title: "Bibanke", artist: "Asa", file: "songs/bibanke.mp3" },
+  { title: "Hummingbird", artist: "Metro Boomin & James Blake (Across the Spider-Verse)", file: "songs/hummingbird.mp3" },
+  { title: "LOVE. (feat. Zacari)", artist: "Kendrick Lamar", file: "songs/love.mp3" },
+  { title: "Labyrinth", artist: "Taylor Swift", file: "songs/labyrinth.mp3" },
+  { title: "Cariño", artist: "The Marías", file: "songs/carino.mp3" },
+  { title: "Always Free", artist: "Jackie Venson", file: "songs/always-free.mp3" },
+  { title: "— add your pick here — (Lacey?)", artist: "", file: "" },
+  { title: "— add your pick here — (Falling Forward?)", artist: "", file: "" },
+  { title: "— add your pick here — (from her Arcane playlist)", artist: "", file: "" }
 ];
 // A couple more Bridgerton-flavoured suggestions if you want extra inspiration —
 // these are real orchestral covers actually used on the show. Delete if unneeded.
@@ -544,16 +542,14 @@ function showModal(d){
   document.getElementById("overlay").classList.add("show");
   box.querySelector(".modal-close").addEventListener("click", closeModal);
   if (d.type === "mixtape") {
-    setupMixtapePlayer(MIXTAPE_TRACKS.filter(t => t.spotifyId));
+    setupMixtapePlayer(MIXTAPE_TRACKS.filter(t => t.file));
   }
 }
 
 function closeModal(){
   document.getElementById("overlay").classList.remove("show");
-  if (spotifyController) {
-    try { spotifyController.pause(); } catch (err) { /* controller already gone */ }
-    spotifyController = null;
-  }
+  const audio = document.getElementById("audioPlayer");
+  if (audio) audio.pause();
 }
 
 document.getElementById("overlay").addEventListener("click", (e) => {
@@ -561,43 +557,19 @@ document.getElementById("overlay").addEventListener("click", (e) => {
 });
 document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
 
-let spotifyController = null;
 let mixtapeOrder = [];
 let currentTrackIdx = 0;
-let lastKnownPosition = 0;
 
 function setupMixtapePlayer(order){
   mixtapeOrder = order;
   currentTrackIdx = 0;
-  lastKnownPosition = 0;
   if (!order.length) return;
-
-  const create = (IFrameAPI) => {
-    const el = document.getElementById("spotify-embed-placeholder");
-    if (!el) return; // modal may have closed before the API finished loading
-    IFrameAPI.createController(el, { uri: "spotify:track:" + order[0].spotifyId, width: "100%", height: "80" }, (controller) => {
-      spotifyController = controller;
-      controller.addListener("playback_update", (e) => onSpotifyPlaybackUpdate(e));
-      controller.addListener("ready", () => { controller.play(); });
-    });
-  };
-
-  if (window.spotifyIframeAPI) {
-    create(window.spotifyIframeAPI);
-  } else {
-    window._spotifyApiReadyCallback = create; // runs once the API script finishes loading
-  }
-}
-
-function onSpotifyPlaybackUpdate(e){
-  const pos = (e && e.data && typeof e.data.position === "number") ? e.data.position : 0;
-  const dur = (e && e.data && typeof e.data.duration === "number") ? e.data.duration : 0;
-  // The embed API has no explicit "track ended" event, so we infer it: if playback
-  // was near the end and position then jumps back near zero, the track finished.
-  if (dur > 0 && lastKnownPosition > dur - 1500 && pos < 1000) {
-    advanceToNextTrack();
-  }
-  lastKnownPosition = pos;
+  const audio = document.getElementById("audioPlayer");
+  if (!audio) return;
+  audio.addEventListener("ended", advanceToNextTrack);
+  audio.addEventListener("play", () => document.getElementById("vinylDisc")?.classList.add("spinning"));
+  audio.addEventListener("pause", () => document.getElementById("vinylDisc")?.classList.remove("spinning"));
+  audio.play().catch(() => { /* browser may block autoplay until she clicks play once */ });
 }
 
 function advanceToNextTrack(){
@@ -608,13 +580,13 @@ function advanceToNextTrack(){
 
 function playTrackAt(idx, el){
   const track = mixtapeOrder[idx];
-  if (!track || !spotifyController) return;
+  const audio = document.getElementById("audioPlayer");
+  if (!track || !audio) return;
   currentTrackIdx = idx;
-  lastKnownPosition = 0;
-  spotifyController.loadUri("spotify:track:" + track.spotifyId);
-  spotifyController.play();
-  const disc = document.getElementById("vinylDisc");
-  if (disc) disc.classList.add("spinning");
+  audio.src = track.file;
+  audio.play().catch(() => {});
+  const nowPlaying = document.getElementById("nowPlaying");
+  if (nowPlaying) nowPlaying.textContent = `${track.title} — ${track.artist}`;
   document.querySelectorAll(".tracklist li").forEach(li => li.classList.remove("active"));
   const targetEl = el || document.querySelector(`.tracklist li[data-idx="${idx}"]`);
   if (targetEl) targetEl.classList.add("active");
@@ -644,7 +616,7 @@ function buildModalContent(d){
   }
 
   if (d.type === "mixtape") {
-    const playable = MIXTAPE_TRACKS.filter(t => t.spotifyId);
+    const playable = MIXTAPE_TRACKS.filter(t => t.file);
     const tracks = MIXTAPE_TRACKS.map((t, i) => {
       const pIndex = playable.indexOf(t);
       const isPlayable = pIndex !== -1;
@@ -656,11 +628,14 @@ function buildModalContent(d){
     const suggestions = MIXTAPE_SUGGESTIONS.map(s => `<p>&bull; ${s}</p>`).join("");
     const player = playable.length
       ? `<div class="player-row">
-           <div class="vinyl spinning" id="vinylDisc"><div class="vinyl-label">${(HER_NAME||"R").charAt(0).toUpperCase()}</div></div>
-           <div id="spotify-embed-placeholder" style="flex:1;"></div>
+           <div class="vinyl" id="vinylDisc"><div class="vinyl-label">${(HER_NAME||"R").charAt(0).toUpperCase()}</div></div>
+           <div style="flex:1;">
+             <div class="now-playing" id="nowPlaying">${playable[0].title} &mdash; ${playable[0].artist}</div>
+             <audio id="audioPlayer" controls style="width:100%;" src="${playable[0].file}"></audio>
+           </div>
          </div>
-         <p class="rec-note" style="margin:12px 0 0; border-top:none; padding-top:0;">Plays the full song if you're already logged into Spotify in this browser — otherwise a 30-second preview. It moves to the next track on its own.</p>`
-      : "";
+         <p class="rec-note" style="margin:12px 0 0; border-top:none; padding-top:0;">Full songs, playing straight from your files — moves to the next track on its own.</p>`
+      : `<p class="rec-note" style="border-top:none; padding-top:0;">Add mp3 files to a "songs" folder next to this page and list them in MIXTAPE_TRACKS to bring this to life.</p>`;
     return `
       <button class="modal-close" aria-label="Close">&times;</button>
       <div class="modal-label">Dispatch the Third</div>
