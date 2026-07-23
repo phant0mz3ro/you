@@ -650,7 +650,6 @@ function buildModalContent(d){
     const suggestions = MIXTAPE_SUGGESTIONS.map(s => `<p>&bull; ${s}</p>`).join("");
     const player = playable.length
       ? `<div class="player-row">
-           <div class="vinyl" id="vinylDisc"><div class="vinyl-label">${(HER_NAME||"R").charAt(0).toUpperCase()}</div></div>
            <div style="flex:1;">
              <div class="now-playing" id="nowPlaying">${playable[0].title} &mdash; ${playable[0].artist}</div>
              <div class="cassette" id="mixtapeCassette">
