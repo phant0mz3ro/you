@@ -132,6 +132,29 @@
     box-shadow:0 12px 26px -16px var(--paper-shadow);
     transition:transform 0.25s ease, box-shadow 0.25s ease;
   }
+  .cassette{
+  width:112px; min-width:112px; background:linear-gradient(160deg, #3a2f22, #241c14);
+  border-radius:8px; padding:10px; box-shadow:0 6px 14px rgba(0,0,0,0.4);
+}
+.cassette-window{
+  background:#e9dfc4; border-radius:4px; padding:8px 10px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+.reel{
+  width:32px; height:32px; border-radius:50%;
+  background:
+    radial-gradient(circle, #2b2118 0 4px, transparent 5px),
+    repeating-conic-gradient(#5c4e37 0deg 22.5deg, #3a3122 22.5deg 45deg);
+  border:2px solid var(--sage-deep);
+  animation-name:spin; animation-duration:1.6s; animation-timing-function:linear;
+  animation-iteration-count:infinite; animation-play-state:paused;
+}
+.cassette.spinning .reel{animation-play-state:running;}
+@keyframes spin{ to{transform:rotate(360deg);} }
+.cassette-label{
+  text-align:center; font-family:"EB Garamond", serif; font-size:9.5px; letter-spacing:0.14em;
+  color:#c9bb95; text-transform:uppercase; margin-top:7px;
+}
   .envelope:hover{transform:translateY(-5px); box-shadow:0 20px 34px -16px var(--paper-shadow);}
   .envelope:focus-visible{outline:2px solid var(--rose-deep); outline-offset:3px;}
   .envelope.locked{cursor:not-allowed; opacity:0.72;}
@@ -254,7 +277,6 @@
     animation-iteration-count:infinite; animation-play-state:paused;
   }
   .vinyl.spinning{animation-play-state:running;}
-  @keyframes spin{ to{transform:rotate(360deg);} }
   .vinyl-label{
     width:24px; height:24px; border-radius:50%; background:var(--rose-deep);
     display:flex; align-items:center; justify-content:center;
@@ -567,8 +589,8 @@ function setupMixtapePlayer(order){
   const audio = document.getElementById("audioPlayer");
   if (!audio) return;
   audio.addEventListener("ended", advanceToNextTrack);
-  audio.addEventListener("play", () => document.getElementById("vinylDisc")?.classList.add("spinning"));
-  audio.addEventListener("pause", () => document.getElementById("vinylDisc")?.classList.remove("spinning"));
+  audio.addEventListener("play", () => document.getElementById("mixtapeCassette")?.classList.add("spinning"));
+  audio.addEventListener("pause", () => document.getElementById("mixtapeCassette")?.classList.remove("spinning"));
   audio.play().catch(() => { /* browser may block autoplay until she clicks play once */ });
 }
 
@@ -631,6 +653,10 @@ function buildModalContent(d){
            <div class="vinyl" id="vinylDisc"><div class="vinyl-label">${(HER_NAME||"R").charAt(0).toUpperCase()}</div></div>
            <div style="flex:1;">
              <div class="now-playing" id="nowPlaying">${playable[0].title} &mdash; ${playable[0].artist}</div>
+             <div class="cassette" id="mixtapeCassette">
+              <div class="cassette-window"><div class="reel"></div><div class="reel"></div></div>
+              <div class="cassette-label">Side A</div>
+            </div>
              <audio id="audioPlayer" controls style="width:100%;" src="${playable[0].file}"></audio>
            </div>
          </div>
