@@ -132,14 +132,7 @@
     box-shadow:0 12px 26px -16px var(--paper-shadow);
     transition:transform 0.25s ease, box-shadow 0.25s ease;
   }
-  .cassette{
-  width:112px; min-width:112px; background:linear-gradient(160deg, #3a2f22, #241c14);
-  border-radius:8px; padding:10px; box-shadow:0 6px 14px rgba(0,0,0,0.4);
-}
-.cassette-window{
-  background:#e9dfc4; border-radius:4px; padding:8px 10px;
-  display:flex; justify-content:space-between; align-items:center;
-}
+  
 .reel{
   width:32px; height:32px; border-radius:50%;
   background:
@@ -149,12 +142,7 @@
   animation-name:spin; animation-duration:1.6s; animation-timing-function:linear;
   animation-iteration-count:infinite; animation-play-state:paused;
 }
-.cassette.spinning .reel{animation-play-state:running;}
-@keyframes spin{ to{transform:rotate(360deg);} }
-.cassette-label{
-  text-align:center; font-family:"EB Garamond", serif; font-size:9.5px; letter-spacing:0.14em;
-  color:#c9bb95; text-transform:uppercase; margin-top:7px;
-}
+
   .envelope:hover{transform:translateY(-5px); box-shadow:0 20px 34px -16px var(--paper-shadow);}
   .envelope:focus-visible{outline:2px solid var(--rose-deep); outline-offset:3px;}
   .envelope.locked{cursor:not-allowed; opacity:0.72;}
@@ -267,22 +255,7 @@
     color:#e4d9bc; margin-bottom:6px;
   }
   #audioPlayer{border-radius:20px;}
-  .vinyl{
-    width:64px; height:64px; min-width:64px; border-radius:50%;
-    background:
-      repeating-radial-gradient(circle at center, #1a1410 0px, #1a1410 2px, #2b2118 3px, #2b2118 4px);
-    display:flex; align-items:center; justify-content:center;
-    box-shadow:0 6px 14px rgba(0,0,0,0.4);
-    animation-name:spin; animation-duration:2.8s; animation-timing-function:linear;
-    animation-iteration-count:infinite; animation-play-state:paused;
-  }
-  .vinyl.spinning{animation-play-state:running;}
-  .vinyl-label{
-    width:24px; height:24px; border-radius:50%; background:var(--rose-deep);
-    display:flex; align-items:center; justify-content:center;
-    font-family:"Playfair Display", serif; font-weight:700; font-style:italic;
-    color:#f6e9c9; font-size:12px;
-  }
+ 
   .tracklist{list-style:none; padding:0; margin:0;}
   .tracklist li{
     display:flex; justify-content:space-between; gap:10px;
@@ -327,7 +300,13 @@
     .modal{padding:28px 20px 24px;}
     .countdown-grid{gap:14px;}
     .cd-num{font-size:30px;}
-  }
+
+    .cassette-wrap{ width:220px; }
+    .cassette-wrap svg{ width:100%; display:block; filter:drop-shadow(0 6px 14px rgba(0,0,0,0.4)); }
+    .reel-group{ animation:spin 1.6s linear infinite; animation-play-state:paused; }
+    .cassette-wrap.spinning .reel-group{ animation-play-state:running; }
+    @keyframes spin{ to{ transform:rotate(360deg); } }
+      }
 </style>
 </head>
 <body>
@@ -652,9 +631,39 @@ function buildModalContent(d){
       ? `<div class="player-row">
            <div style="flex:1;">
              <div class="now-playing" id="nowPlaying">${playable[0].title} &mdash; ${playable[0].artist}</div>
-             <div class="cassette" id="mixtapeCassette">
-              <div class="cassette-window"><div class="reel"></div><div class="reel"></div></div>
-              <div class="cassette-label">Side A</div>
+            <div class="cassette-wrap" id="mixtapeCassette">
+              <svg viewBox="0 0 300 190" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="2" width="296" height="186" rx="14" fill="#141414" stroke="#000" stroke-width="2"/>
+                <rect x="18" y="16" width="264" height="70" rx="4" fill="#efe4c8" stroke="#2b2118" stroke-width="1.5"/>
+                <text x="150" y="42" text-anchor="middle" font-family="Playfair Display, serif" font-style="italic" font-weight="700" font-size="20" fill="#2b2118">Mixtape</text>
+                <line x1="30" y1="58" x2="270" y2="58" stroke="#b0a887" stroke-width="1"/>
+                <text x="150" y="76" text-anchor="middle" font-family="EB Garamond, serif" font-size="11" letter-spacing="2" fill="#7a6a52">SIDE A</text>
+                <rect x="40" y="96" width="220" height="66" rx="6" fill="#c7bda0" stroke="#000" stroke-width="1.5"/>
+                <g class="reel-group" style="transform-origin:100px 129px;">
+                  <circle cx="100" cy="129" r="26" fill="#2b2118"/>
+                  <circle cx="100" cy="129" r="8" fill="#c7bda0"/>
+                  <g stroke="#c7bda0" stroke-width="4">
+                    <line x1="100" y1="103" x2="100" y2="115"/><line x1="100" y1="143" x2="100" y2="155"/>
+                    <line x1="74" y1="129" x2="86" y2="129"/><line x1="114" y1="129" x2="126" y2="129"/>
+                    <line x1="82" y1="111" x2="90" y2="119"/><line x1="110" y1="139" x2="118" y2="147"/>
+                    <line x1="118" y1="111" x2="110" y2="119"/><line x1="90" y1="139" x2="82" y2="147"/>
+                  </g>
+                </g>
+                <g class="reel-group" style="transform-origin:200px 129px;">
+                  <circle cx="200" cy="129" r="26" fill="#2b2118"/>
+                  <circle cx="200" cy="129" r="8" fill="#c7bda0"/>
+                  <g stroke="#c7bda0" stroke-width="4">
+                    <line x1="200" y1="103" x2="200" y2="115"/><line x1="200" y1="143" x2="200" y2="155"/>
+                    <line x1="174" y1="129" x2="186" y2="129"/><line x1="214" y1="129" x2="226" y2="129"/>
+                    <line x1="182" y1="111" x2="190" y2="119"/><line x1="210" y1="139" x2="218" y2="147"/>
+                    <line x1="218" y1="111" x2="210" y2="119"/><line x1="190" y1="139" x2="182" y2="147"/>
+                  </g>
+                </g>
+                <line x1="126" y1="129" x2="174" y2="129" stroke="#4a3d2c" stroke-width="3"/>
+                <circle cx="20" cy="172" r="4" fill="#3a3122"/>
+                <circle cx="280" cy="172" r="4" fill="#3a3122"/>
+                <circle cx="150" cy="176" r="4" fill="#3a3122"/>
+              </svg>
             </div>
              <audio id="audioPlayer" controls style="width:100%;" src="${playable[0].file}"></audio>
            </div>
